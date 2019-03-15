@@ -1,0 +1,17 @@
+{
+  "name": "phone-call-plugin",
+  "version": "1.0.0",
+  "description": "This plugin use to verify PhoneCallPlugin",
+  "cordova": {
+    "id": "phone-call-plugin",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "lieon",
+  "license": "ISC"
+}

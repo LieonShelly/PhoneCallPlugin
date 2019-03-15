@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="phone-call-plugin"
+    version="0.1">
+    
+    <name>PhoneCallPlugin</name>
+    <description>This plugin use to verify PhoneCallPlugin</description>
+    
+    <js-module src="phone-call-plugin.js">
+        <clobbers target="window.PhoneCallPlugin" />
+    </js-module>
+    
+    <!-- iOS -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="PhoneCallPlugin">
+                <param name="ios-package" value="PhoneCallPlugin" />
+            </feature>
+        </config-file>
+        <source-file src="src/ios/PhoneCallPlugin.swift" />
+    </platform>
+    
+</plugin>
