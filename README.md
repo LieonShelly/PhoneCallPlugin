@@ -2,13 +2,6 @@
 PhoneCallPlugin
 
 ### Install
-  add swift support
-
-```
-  cordova plugin add cordova-plugin-add-swift-support
-```
-
-add plugin
 
 ```
    cordova plugin add phone-call-plugin

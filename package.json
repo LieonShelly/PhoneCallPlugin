@@ -1,6 +1,6 @@
 {
   "name": "phone-call-plugin",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "description": "This plugin use to verify PhoneCallPlugin",
   "cordova": {
     "id": "phone-call-plugin",

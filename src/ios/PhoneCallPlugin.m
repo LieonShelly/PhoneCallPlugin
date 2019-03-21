@@ -9,35 +9,27 @@
 #import "PhoneCallPlugin.h"
 #import <UIKit/UIKit.h>
 
+
 @implementation PhoneCallPlugin
 
-- (instancetype)init {
-    if (self = [super init]) {
-        self.callObserver = [[CXCallObserver alloc]init];
-        [self.callObserver setDelegate:self queue:dispatch_get_main_queue()];
-    }
-    return self;
-}
-
 - (void)callWithCommand: (CDVInvokedUrlCommand*)command  {
-    [self.commandDelegate runInBackground:^{
+    self.callObserver = [[CXCallObserver alloc]init];
+    [self.callObserver setDelegate:self queue:dispatch_get_main_queue()];
+    NSString* number = [command.arguments objectAtIndex:0];
+    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@", number]] options:@{} completionHandler:^(BOOL success) {
+        NSLog(@"completionHandler-success");
         
-        CDVPluginResult* pluginResult = nil;
-        NSString * number = @"10010";
-        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@", number]] options:@{} completionHandler:^(BOOL success) {
-            
-        }];
-        self.callback = ^(PhoneCallStatus status) {
-            NSLog(@"%ld",status);
-            if (status == -1 || status == -2 ){
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"%ld", status]];
-            } else {
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%ld", status]];
-            }
-             [self.commandDelegate sendPluginResult:pluginResult callbackId: command.callbackId];
-        };
     }];
-    
+    self.callback = ^(PhoneCallStatus status) {
+        NSLog(@"%ld",status);
+        CDVPluginResult* pluginResult = nil;
+        if (status == -1 || status == -2 ){
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"%ld", status]];
+        } else {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%ld", status]];
+        }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId: command.callbackId];
+    };
   
 }
 
@@ -63,5 +55,10 @@
         NSLog(@"电话error");
     }
     self.callback(status);
+}
+
+
+- (void)dealloc {
+    NSLog(@"--PhoneCallPlugin--dealloc----");
 }
 @end
