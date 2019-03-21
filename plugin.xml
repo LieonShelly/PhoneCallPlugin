@@ -17,7 +17,8 @@
                 <param name="ios-package" value="PhoneCallPlugin" />
             </feature>
         </config-file>
-        <source-file src="src/ios/PhoneCallPlugin.swift" />
+        <header-file src="src/ios/PhoneCallPlugin.h" />
+        <source-file src="src/ios/PhoneCallPlugin.m" />
     </platform>
     
 </plugin>
