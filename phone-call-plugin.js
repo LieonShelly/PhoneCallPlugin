@@ -10,4 +10,4 @@ var PhoneCallPlugin = {
 
 };
 
-module.exports = HanggeSwiftPlugin; 
+module.exports = PhoneCallPlugin; 
