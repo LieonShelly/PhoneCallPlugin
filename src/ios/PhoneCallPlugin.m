@@ -49,9 +49,7 @@
 - (void)callObserver:(CXCallObserver *)callObserver callChanged:(CXCall *)call {
     
     if (call.isOutgoing) {
-        if (fireTime == 0) {
-            fireTime = self.currentTime;
-        }
+        fireTime = 0;
         NSLog(@"电话播出: %ld", fireTime);
         if (call.hasConnected) {
             if (connectTime == 0) {
@@ -60,20 +58,28 @@
             connectTimeTotal = connectTime - fireTime;
             NSLog(@"电话接通的时间点: %ld", connectTime);
             NSLog(@"播出---->接通的时间段: %ld", connectTimeTotal);
+          
         }
         if (call.hasEnded) {
             if (endTime == 0) {
                  endTime = self.currentTime;
             }
-            NSInteger endTimeTotal = endTime - connectTime;
-            NSLog(@"电话挂断: %ld", endTime);
-            NSLog(@"接通---->挂断的时间段: %ld", endTimeTotal);
+            if (connectTime > 0) {
+                NSInteger endTimeTotal = endTime - connectTime;
+                NSLog(@"电话挂断: %ld", endTime);
+                NSLog(@"接通---->挂断的时间段: %ld", endTimeTotal);
+                self.callback(connectTimeTotal, endTimeTotal);
+            } else {
+                NSInteger endTimeTotal = endTime - fireTime;
+                NSLog(@"电话挂断: %ld", endTime);
+                NSLog(@"接通---->挂断的时间段: %ld", endTimeTotal);
+                self.callback(endTimeTotal, 0);
+            }
             [self.timer invalidate];
             endTime = 0;
             connectTime = 0;
             fireTime = 0;
             self.currentTime = 0;
-            self.callback(connectTimeTotal, endTimeTotal);
         }
         if (call.isOnHold) {
             if (onholdTime == 0) {
