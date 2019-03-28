@@ -23,7 +23,10 @@ typedef enum : NSUInteger {
 
 @interface PhoneCallPlugin : CDVPlugin<CXCallObserverDelegate>
 @property (nonatomic, strong) CXCallObserver *callObserver;
-@property (nonatomic, copy) void(^callback)(PhoneCallStatus status);
+@property (nonatomic, copy) void(^callback)(NSInteger dialingTime, NSInteger talkTime);
+@property (nonatomic, strong) NSTimer *timer;
+
+@property (nonatomic, assign) NSInteger currentTime;
 
 - (void)callWithCommand: (CDVInvokedUrlCommand*)command;
 
