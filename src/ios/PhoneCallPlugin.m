@@ -23,8 +23,6 @@
 
 - (void)callWithCommand: (CDVInvokedUrlCommand*)command  {
     self.callObserver = [[CXCallObserver alloc]init];
-    self.timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(timerAction) userInfo:nil repeats:true];
-    [[NSRunLoop currentRunLoop]addTimer:self.timer forMode:NSRunLoopCommonModes];
     [self.callObserver setDelegate:self queue:dispatch_get_main_queue()];
     NSString* number = [command.arguments objectAtIndex:0];
     [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@", number]] options:@{} completionHandler:^(BOOL success) {
@@ -50,6 +48,11 @@
     
     if (call.isOutgoing) {
         fireTime = 0;
+        if (!self.timer.isValid) {
+            self.timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(timerAction) userInfo:nil repeats:true];
+            [[NSRunLoop currentRunLoop]addTimer:self.timer forMode:NSRunLoopCommonModes];
+            [self.timer fire];
+        }
         NSLog(@"电话播出: %ld", fireTime);
         if (call.hasConnected) {
             if (connectTime == 0) {
