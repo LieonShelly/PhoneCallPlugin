@@ -18,7 +18,7 @@
             </feature>
         </config-file>
         <header-file src="src/ios/PhoneCallPlugin.h" />
-        <source-file src="src/ios/PhoneCallPlugin.m" />
+        <source-file src="src/ios/PhoneCallPlugin.m"  target-dir="src/foo" / >
     </platform>
     
 </plugin>
