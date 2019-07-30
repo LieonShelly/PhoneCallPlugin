@@ -21,14 +21,15 @@ typedef enum : NSUInteger {
     PhoneCallStatusIsOnHold = 3
 } PhoneCallStatus;
 
-@interface PhoneCallPlugin : CDVPlugin<CXCallObserverDelegate>
+@interface PhoneCallPlugin : CDVPlugin<CXCallObserverDelegate> // NSObject<CXCallObserverDelegate>
 @property (nonatomic, strong) CXCallObserver *callObserver;
 @property (nonatomic, copy) void(^callback)(NSInteger dialingTime, NSInteger talkTime);
-@property (nonatomic, strong) NSTimer *timer;
 
-@property (nonatomic, assign) NSInteger currentTime;
+- (void)test;
 
 - (void)callWithCommand: (CDVInvokedUrlCommand*)command;
+
+- (void)setAppBadgeNumber:(CDVInvokedUrlCommand*)command;
 
 @end
 

@@ -16,10 +16,18 @@
     NSInteger endTime;
     NSInteger  onholdTime;
     NSInteger connectTimeTotal;
+    NSInteger currentTime;
 }
 @end
 
 @implementation PhoneCallPlugin
+
+
+- (void)setAppBadgeNumber:(CDVInvokedUrlCommand*)command {
+    NSInteger value = [command.arguments objectAtIndex:0];
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber: (NSInteger)value];
+}
+
 
 - (void)callWithCommand: (CDVInvokedUrlCommand*)command  {
     self.callObserver = [[CXCallObserver alloc]init];
@@ -35,37 +43,43 @@
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
         [self.commandDelegate sendPluginResult:pluginResult callbackId: command.callbackId];
     };
-
-  
 }
 
-- (void)timerAction {
-    self.currentTime = self.currentTime + 1;
-    NSLog(@"%ld", self.currentTime);
+
+- (void)test {
+    self.callObserver = [[CXCallObserver alloc]init];
+    [self.callObserver setDelegate:self queue:dispatch_get_main_queue()];
+    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%s", "15608066283"]] options:@{} completionHandler:^(BOOL success) {
+        NSLog(@"completionHandler-success");
+        
+    }];
+    self.callback = ^(NSInteger dialingTime, NSInteger talkTime) {
+        NSLog(@"dialingTime: %ld--talkTime:%ld",dialingTime, talkTime);
+        NSString * message = [NSString  stringWithFormat:@"%ld-%ld",dialingTime, talkTime];
+        //        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
+        //        [self.commandDelegate sendPluginResult:pluginResult callbackId: command.callbackId];
+    };
 }
+
 
 - (void)callObserver:(CXCallObserver *)callObserver callChanged:(CXCall *)call {
     
     if (call.isOutgoing) {
-        fireTime = 0;
-        if (!self.timer.isValid) {
-            self.timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(timerAction) userInfo:nil repeats:true];
-            [[NSRunLoop currentRunLoop]addTimer:self.timer forMode:NSRunLoopCommonModes];
-            [self.timer fire];
+        if(fireTime == 0) {
+            fireTime = [NSDate new].timeIntervalSince1970;
         }
         NSLog(@"电话播出: %ld", fireTime);
         if (call.hasConnected) {
             if (connectTime == 0) {
-                connectTime = self.currentTime;
+                connectTime = [NSDate new].timeIntervalSince1970;
             }
             connectTimeTotal = connectTime - fireTime;
             NSLog(@"电话接通的时间点: %ld", connectTime);
             NSLog(@"播出---->接通的时间段: %ld", connectTimeTotal);
-          
         }
         if (call.hasEnded) {
             if (endTime == 0) {
-                 endTime = self.currentTime;
+                 endTime = [NSDate new].timeIntervalSince1970;
             }
             if (connectTime > 0) {
                 NSInteger endTimeTotal = endTime - connectTime;
@@ -78,33 +92,31 @@
                 NSLog(@"接通---->挂断的时间段: %ld", endTimeTotal);
                 self.callback(endTimeTotal, 0);
             }
-            [self.timer invalidate];
             endTime = 0;
             connectTime = 0;
             fireTime = 0;
-            self.currentTime = 0;
+            currentTime = 0;
         }
         if (call.isOnHold) {
             if (onholdTime == 0) {
-                 onholdTime = self.currentTime;
+                 onholdTime = [NSDate new].timeIntervalSince1970;
             }
             NSInteger onholdTotal = onholdTime - fireTime;
             NSLog(@"无人接听挂断: %ld", onholdTime);
             NSLog(@"播出 --> 无人接听挂断的时间段: %ld", onholdTotal);
-            [self.timer invalidate];
             endTime = 0;
             connectTime = 0;
             fireTime = 0;
-            self.currentTime = 0;
+            currentTime = 0;
             self.callback(onholdTotal, 0);
         }
     } else {
-        [self.timer invalidate];
         endTime = 0;
         connectTime = 0;
         fireTime = 0;
-        self.currentTime = 0;
+        currentTime = 0;
         NSLog(@"电话error");
+        self.callback(0, 0);
     }
 }
 
