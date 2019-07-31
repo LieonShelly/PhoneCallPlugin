@@ -37,9 +37,15 @@
         NSLog(@"completionHandler-success");
         
     }];
+    __weak typeof(self) weakSelf = self;
     self.callback = ^(NSInteger dialingTime, NSInteger talkTime) {
         NSLog(@"dialingTime: %ld--talkTime:%ld",dialingTime, talkTime);
-        NSString * message = [NSString  stringWithFormat:@"%ld-%ld",dialingTime, talkTime];
+        NSInteger totalTime = dialingTime + talkTime
+        NSDictionary * res = @{
+                               @"totalTime": [NSNumber numberWithInteger:totalTime],
+                               @"callTime": [NSNumber numberWithInteger:dialingTime]
+                               };
+        NSString * message = [weakSelf dictionaryToJson:res];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
         [self.commandDelegate sendPluginResult:pluginResult callbackId: command.callbackId];
     };
@@ -60,6 +66,17 @@
         //        [self.commandDelegate sendPluginResult:pluginResult callbackId: command.callbackId];
     };
 }
+
+
+//字典转json格式字符串：
+- (NSString*)dictionaryToJson:(NSDictionary *)dic
+{
+    NSError *parseError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
+    
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 
 
 - (void)callObserver:(CXCallObserver *)callObserver callChanged:(CXCall *)call {
