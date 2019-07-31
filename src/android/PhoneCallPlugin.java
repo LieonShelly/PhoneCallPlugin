@@ -1,4 +1,4 @@
-package com.netson.safecampus.facedemo.detection;
+package phone.call.plugin;
 
 import android.Manifest;
 import android.content.Context;
@@ -8,8 +8,20 @@ import android.net.Uri;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+// import org.apache.cordova.BuildHelper;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+// import org.apache.cordova.CordovaResourceApi;
+import android.util.Log;
+
+import org.apache.cordova.PermissionHelper;
+import org.apache.cordova.PluginResult;
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import android.util.Log;
 
 import java.util.List;
 
@@ -25,7 +37,7 @@ public class PhoneCallPlugin extends CordovaPlugin {
     private CustomPhoneStateListener listener;
 
     protected void getCallPermission(int requestCode) {
-        cordova.requestPermission(this, requestCode, PERMISSION);
+        cordova.requestPermissions(this, requestCode, PERMISSION);
     }
 
     @Override
@@ -33,8 +45,8 @@ public class PhoneCallPlugin extends CordovaPlugin {
         this.callbackContext = callbackContext;
         this.executeArgs = args;
 
-        if (action.equals("callNumber")) {
-            if (cordova.hasPermission(PERMISSION)) {
+        if (action.equals("callWithCommand")) {
+            if (cordova.hasPermission(PERMISSION[0]) && cordova.hasPermission(PERMISSION[1])) {
                 callPhone(executeArgs);
             } else {
                 getCallPermission(CALL_REQ_CODE);
@@ -58,37 +70,47 @@ public class PhoneCallPlugin extends CordovaPlugin {
         }
         switch (requestCode) {
             case CALL_REQ_CODE:
-                listener = new CustomPhoneStateListener(callbackContext);
-                Intent intent = new Intent(cordova.getActivity(), PhoneListenService.class);
-                intent.putExtra("listener", listener);
-                cordova.getActivity().startService(intent);
-                cordova.getActivity().
-                        callPhone(executeArgs);
+                callPhone(executeArgs);
                 break;
         }
     }
 
     private void callPhone(JSONArray args) throws JSONException {
         String number = args.getString(0);
-        number = number.replaceAll("#", "%23");
 
         if (!number.startsWith("tel:")) {
             number = String.format("tel:%s", number);
         }
         try {
             Intent intent = new Intent(isTelephonyEnabled() ? Intent.ACTION_CALL : Intent.ACTION_VIEW);
+            PhoneCallTimeListener callback = new PhoneCallTimeListener() {
+                @Override
+                public void dialingTime(String time) {
+                    Log.d("call---->", time);
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, time));
+                    listener.stopListener();
+                }
+
+                @Override
+                public void talkingTime(String time) {
+                    Log.d("call----->", time);
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, time));
+                    listener.stopListener();
+                }
+            };
+
+            listener = new CustomPhoneStateListener(cordova.getActivity(), number.substring(4) callback);
+            listener.startListener();
             intent.setData(Uri.parse(number));
-
-            boolean bypassAppChooser = Boolean.parseBoolean(args.getString(1));
-            if (bypassAppChooser) {
-                intent.setPackage(getDialerPackage(intent));
-            }
-
+            intent.setPackage(getDialerPackage(intent));
             cordova.getActivity().startActivity(intent);
+
         } catch (Exception e) {
-            callbackContext.error("CouldNotCallPhoneNumber");
+
+            callbackContext.error("CouldNotCallPhoneNumber" + e);
         }
     }
+
 
     private boolean isTelephonyEnabled() {
         TelephonyManager tm = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);

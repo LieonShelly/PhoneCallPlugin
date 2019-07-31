@@ -1,4 +1,4 @@
-package com.netson.safecampus.facedemo.detection;
+package phone.call.plugin;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
