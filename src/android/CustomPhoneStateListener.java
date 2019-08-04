@@ -65,16 +65,17 @@ public class CustomPhoneStateListener extends PhoneStateListener implements Seri
                 long time = System.currentTimeMillis() - callPhoneTime;
                 if (preState == TelephonyManager.CALL_STATE_RINGING) {
                     Log.i(PhoneListenService.TAG, "onCallStateChanged: 响铃时长（未接通挂断）=" + time / 1000 + "s");
-                    String str = "{\"totalTime\":" + (time / 1000) + ",\"callTime\":" + getCallTime(time) + "}";
-                    this.mTimeListener.dialingTime(str);
+                    getCallTime(time);
+//                    String str = "{\"totalTime\":" + (time / 1000) + ",\"callTime\":" + getCallTime(time) + "}";
+//                    this.mTimeListener.dialingTime(str);
                 } else if (preState == TelephonyManager.CALL_STATE_OFFHOOK) {
                     Log.i(PhoneListenService.TAG, "onCallStateChanged: 通话总时长=" + time / 1000 + "s");
                     if (dialingTime > 1000) {
                         dialingTime = 0;
                     }
-                    String str = "{\"totalTime\":" + (time / 1000) + ",\"callTime\":" + getCallTime(time) + "}";
-                    this.mTimeListener.talkingTime(str);
                     getCallTime(time);
+//                    String str = "{\"totalTime\":" + (time / 1000) + ",\"callTime\":" + getCallTime(time) + "}";
+//                    this.mTimeListener.talkingTime(str);
                 }
                 break;
             case TelephonyManager.CALL_STATE_RINGING:   // 电话响铃
@@ -178,9 +179,13 @@ public class CustomPhoneStateListener extends PhoneStateListener implements Seri
                 @SuppressLint("SimpleDateFormat") String dayCurrent = new SimpleDateFormat("dd").format(new Date());
                 @SuppressLint("SimpleDateFormat") String dayRecord = new SimpleDateFormat("dd").format(new Date(dateLong));
 
-                if(mPhone".equals(number) && type == CallLog.Calls.OUTGOING_TYPE && Integer.parseInt(dayCurrent) == Integer.parseInt(dayRecord)){
+                if(mPhone.equals(number) && type == CallLog.Calls.OUTGOING_TYPE && Integer.parseInt(dayCurrent) == Integer.parseInt(dayRecord)){
                     flag = false;
-                    Toast.makeText(mActivity, "通话总时长=" + totalTime / 1000 + "s  通话时长= " + duration, Toast.LENGTH_LONG).show();
+
+                    Toast.makeText(mActivity, "通话总时长=" + totalTime / 1000 + "s  通话时长= " + duration, Toast.LENGTH_LONG);
+                           // .show();
+                    String str = "{\"totalTime\":" + totalTime / 1000 + ",\"callTime\":" + (totalTime / 1000 - duration) + "}";
+                    this.mTimeListener.talkingTime(str);
                 }
             }
         }

@@ -99,7 +99,7 @@ public class PhoneCallPlugin extends CordovaPlugin {
                 }
             };
 
-            listener = new CustomPhoneStateListener(cordova.getActivity(), number.substring(4) callback);
+            listener = new CustomPhoneStateListener(cordova.getActivity(), number.substring(4), callback);
             listener.startListener();
             intent.setData(Uri.parse(number));
             intent.setPackage(getDialerPackage(intent));

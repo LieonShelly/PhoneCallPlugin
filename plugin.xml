@@ -24,7 +24,7 @@
     <platform name="android">
         <config-file target="config.xml" parent="/*">
             <feature name="PhoneCallPlugin">
-                <param name="android-package" value="org.apache.cordova.plugin.PhoneCallPlugin"/>
+                <param name="android-package" value="phone.call.plugin.PhoneCallPlugin"/>
             </feature>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/*">
@@ -32,9 +32,10 @@
           <uses-feature android:name="android.hardware.telephony" android:required="false" /> 
           <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
         </config-file>
-        <source-file src="src/android/PhoneCallPlugin.java" target-dir="src/org/apache/cordova/plugin" />
-        <source-file src="src/android/CustomPhoneStateListener.java" target-dir="src/org/apache/cordova/plugin" />
-        <source-file src="src/android/PhoneListenService.java" target-dir="src/org/apache/cordova/plugin" />
-        <source-file src="src/android/PhoneStateReceiver.java" target-dir="src/org/apache/cordova/plugin" />
+        <source-file src="src/android/PhoneCallPlugin.java" target-dir="src/phone/call/plugin" />
+        <source-file src="src/android/CustomPhoneStateListener.java" target-dir="src/phone/call/plugin" />
+        <source-file src="src/android/PhoneListenService.java" target-dir="src/phone/call/plugin" />
+        <source-file src="src/android/PhoneStateReceiver.java" target-dir="src/phone/call/plugin" />
+        <source-file src="src/android/PhoneCallTimeListener.java" target-dir="src/phone/call/plugin" />
     </platform>
 </plugin>
